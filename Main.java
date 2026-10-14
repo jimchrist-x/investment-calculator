@@ -6,8 +6,8 @@ public class Main {
     data.addPeriod(4, 0.07, 887.5, Frequency.CONTINUOUS, false, true);
     data.addPeriod(4, 0.07, 1070.5, Frequency.CONTINUOUS, false, true);
     data.addPeriod(4, 0.07, 1183.0, Frequency.CONTINUOUS, false, true);
-    data.addPeriod(4, 0.07, 1183.0, Frequency.CONTINUOUS, false, true);
+    data.addPeriod(25, 0.07, 1183.0, Frequency.CONTINUOUS, false, true);
     InvestmentPeriods portfolio = new InvestmentPeriods(data);
-    System.out.println(portfolio.calculate());
+    System.out.printf("Final balance: %,.2f%n", portfolio.calculate());
   }
 }

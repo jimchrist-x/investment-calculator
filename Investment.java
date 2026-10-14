@@ -47,30 +47,31 @@ public class Investment {
   }
   private void setFrequency(Frequency frequency) {
     switch (frequency) {
-      case Frequency.ANNUALLY:
+      case ANNUALLY:
         compoundFrequency=1;
         break;
-      case Frequency.SEMIANNUALLY:
+      case SEMIANNUALLY:
         compoundFrequency=2;
         break;
-      case Frequency.QUARTERLY:
+      case QUARTERLY:
         compoundFrequency=4;
         break;
-      case Frequency.MONTHLY:
+      case MONTHLY:
         compoundFrequency=12;
         break;
-      case Frequency.SEMIMONTHLY: compoundFrequency=24;
+      case SEMIMONTHLY: 
+        compoundFrequency=24;
         break;
-      case Frequency.BIWEEKLY:
+      case BIWEEKLY:
         compoundFrequency=365.0/14;
         break;
-      case Frequency.WEEKLY:
+      case WEEKLY:
         compoundFrequency=365.0/7;
         break;
-      case Frequency.DAILY:
+      case DAILY:
         compoundFrequency=365;
         break;
-      case Frequency.CONTINUOUS:
+      case CONTINUOUS:
         isContinuous=true;
         break;
       default:
