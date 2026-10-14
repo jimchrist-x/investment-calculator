@@ -1,3 +1,5 @@
+import java.util.List;
+import java.util.ArrayList; 
 public class Investment {
   private double startingAmount;
   private double periodInYears;
@@ -17,7 +19,7 @@ public class Investment {
     this.contributeAtBeginning=contributeAtBeginning;
     this.contributeEachMonth=contributeEachMonth;
   }
-  public double calculate() {
+  public InvestmentResult calculate(int startingMonthOffset) {
     double amount=startingAmount;
     double monthlyRate;
     if (isContinuous) {
@@ -26,24 +28,37 @@ public class Investment {
       monthlyRate=Math.pow(1+(rate/compoundFrequency), compoundFrequency/12)-1;
     }
     int months=(int)Math.round(periodInYears*12);
+    List<MonthlySnapshot> snapshots = new ArrayList<>(months);
+    double totalContributions = 0.0;
+    double totalInterest = 0.0;
     for (int month=0; month<months;month++) {
+      double monthStartBalance=amount;
+      double currentMonthContribution=0.0;
       if (contributeEachMonth && contributeAtBeginning) {
         amount+=contribution;
+        currentMonthContribution+=contribution;
       } else if (!contributeEachMonth && contributeAtBeginning) {
         if (month%12==0) {
           amount+=contribution;
+          currentMonthContribution+=contribution;
         }
       }
-      amount*=(1+monthlyRate);
+      double interestEarned=amount*monthlyRate;
+      amount+=interestEarned;
       if (contributeEachMonth && !contributeAtBeginning) {
         amount+=contribution;
+        currentMonthContribution+=contribution;
       } else if (!contributeEachMonth && !contributeAtBeginning) {
         if ((month+1)%12==0) {
           amount+=contribution;
+          currentMonthContribution+=contribution;
         }
       }
+      totalContributions+=currentMonthContribution;
+      totalInterest+=interestEarned;
+      snapshots.add(new MonthlySnapshot(startingMonthOffset+month+1, monthStartBalance, currentMonthContribution, interestEarned, amount));
     }
-    return amount;
+    return new InvestmentResult(amount, totalContributions, totalInterest, snapshots);
   }
   private void setFrequency(Frequency frequency) {
     switch (frequency) {
