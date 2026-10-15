@@ -1,3 +1,4 @@
+package art.stalaverse.investment.model;
 public enum Frequency {
   ANNUALLY,
   SEMIANNUALLY,

@@ -1,3 +1,4 @@
+package art.stalaverse.investment.model;
 public class InvestmentPeriod {
   private final int years;
   private final double rate, contribution;

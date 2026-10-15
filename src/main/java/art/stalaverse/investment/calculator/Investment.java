@@ -1,3 +1,7 @@
+package art.stalaverse.investment.calculator;
+import art.stalaverse.investment.model.Frequency;
+import art.stalaverse.investment.model.InvestmentResult;
+import art.stalaverse.investment.model.MonthlySnapshot;
 import java.util.List;
 import java.util.ArrayList; 
 public class Investment {

@@ -1,4 +1,10 @@
-public class Main {
+package art.stalaverse.investment;
+import art.stalaverse.investment.calculator.InvestmentPeriods;
+import art.stalaverse.investment.model.InvestmentData;
+import art.stalaverse.investment.model.InvestmentResult;
+import art.stalaverse.investment.model.MonthlySnapshot;
+import art.stalaverse.investment.model.Frequency;
+public class App {
     public static void main(String[] args) {
         InvestmentData data = new InvestmentData(9790.47);
         data.addPeriod(4, 0.07, 200.0, Frequency.CONTINUOUS, false, true);
