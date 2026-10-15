@@ -4,6 +4,7 @@ import art.stalaverse.investment.model.InvestmentData;
 import art.stalaverse.investment.model.InvestmentResult;
 import art.stalaverse.investment.model.MonthlySnapshot;
 import art.stalaverse.investment.model.Frequency;
+import art.stalaverse.investment.model.YearlySnapshot;
 public class App {
     public static void main(String[] args) {
         InvestmentData data = new InvestmentData(9790.47);
@@ -15,12 +16,26 @@ public class App {
         data.addPeriod(25, 0.07, 1183.0, Frequency.CONTINUOUS, false, true);
         InvestmentPeriods portfolio = new InvestmentPeriods(data);
         InvestmentResult result = portfolio.calculate();
+        printYearlyReport(result);
+        printMonthlyReport(result);
+        printSummary(result);
+    }
+    private static void printYearlyReport(InvestmentResult result) {
+      System.out.printf("%-8s | %-15s | %-15s | %-15s | %-15s%n", "Year", "Start Balance", "Contributions", "Interest", "End Balance");
+      System.out.println("-".repeat(78));
+      for (YearlySnapshot year : result.yearlySnapshots()) {
+        System.out.printf("%-8d | %,15.0f | %,15.0f | %,15.0f | %,15.0f%n", year.yearIndex(), year.startingBalance(), year.totalContributions(), year.totalInterestEarned(), year.endingBalance());
+      }
+    }
+    private static void printMonthlyReport(InvestmentResult result) {
         System.out.printf("%-8s | %-15s | %-15s | %-15s | %-15s%n",
                 "Month", "Start Balance", "Contribution", "Interest", "End Balance");
         System.out.println("-".repeat(78));
         for (MonthlySnapshot snapshot : result.monthlySnapshots()) {
             System.out.printf("%-8d | %,15.0f | %,15.0f | %,15.0f | %,15.0f%n", snapshot.monthIndex(), snapshot.startingBalance(), snapshot.contribution(), snapshot.interestEarned(), snapshot.endingBalance());
         }
+    }
+    private static void printSummary(InvestmentResult result) {
         System.out.println("-".repeat(78));
         System.out.printf("Total Contributions: %,.0f%n", result.totalContributions());
         System.out.printf("Total Interest:      %,.0f%n", result.totalInterestEarned());
