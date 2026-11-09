@@ -1,7 +1,18 @@
 *.class
 *.jar
 .env
+
+# Gradle
 .gradle/
+build/
+
+# Eclipse
 .project
 .settings/
-build/
+.classpath
+bin/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
