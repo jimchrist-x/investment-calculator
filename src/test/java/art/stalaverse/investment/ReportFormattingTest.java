@@ -15,9 +15,7 @@ import org.junit.jupiter.api.Test;
 /** Issue #4: the console report must show cents, line up, and reconcile row by row. */
 class ReportFormattingTest {
 
-  private static final Pattern DATA_ROW = Pattern.compile("^\\s*\\d+\\s*\\|.*");
-  private static final Pattern RULE = Pattern.compile("^-+$");
-  private static final String COLUMN_SEPARATOR = "\\s\\|\\s";
+  private static final String COLUMN_SEPARATOR = " | ";
 
   private static List<String> runApp() {
     PrintStream original = System.out;
@@ -29,16 +27,25 @@ class ReportFormattingTest {
       System.setOut(original);
     }
     List<String> lines = new ArrayList<>();
-    for (String line : buffer.toString(StandardCharsets.UTF_8).split("\\R")) {
-      if (!line.isEmpty()) {
+    for (String raw : buffer.toString(StandardCharsets.UTF_8).split("\n")) {
+      String line = raw.endsWith("\r") ? raw.substring(0, raw.length() - 1) : raw;
+      if (!line.isBlank()) {
         lines.add(line);
       }
     }
     return lines;
   }
 
+  private static boolean isRule(String line) {
+    return !line.isEmpty() && line.chars().allMatch(character -> character == '-');
+  }
+
   private static boolean isTableRow(String line) {
-    return line.contains(" | ");
+    return line.contains(COLUMN_SEPARATOR);
+  }
+
+  private static boolean isDataRow(String line) {
+    return isTableRow(line) && Character.isDigit(line.charAt(0));
   }
 
   @Test
@@ -46,14 +53,14 @@ class ReportFormattingTest {
     List<String> lines = runApp();
     int ruleWidth = -1;
     for (String line : lines) {
-      if (RULE.matcher(line).matches() && ruleWidth < 0) {
+      if (isRule(line) && ruleWidth < 0) {
         ruleWidth = line.length();
       }
     }
     assertTrue(ruleWidth > 0, "no rule was printed");
 
     for (String line : lines) {
-      if (RULE.matcher(line).matches()) {
+      if (isRule(line)) {
         assertEquals(ruleWidth, line.length(), "inconsistent rule width");
       } else if (isTableRow(line)) {
         assertEquals(ruleWidth, line.length(), "row does not line up with the rule: [" + line + "]");
@@ -66,15 +73,14 @@ class ReportFormattingTest {
     List<String> lines = runApp();
     boolean sawDataRow = false;
     for (String line : lines) {
-      if (!DATA_ROW.matcher(line).matches()) {
+      if (!isDataRow(line)) {
         continue;
       }
       sawDataRow = true;
-      String[] cells = line.split(COLUMN_SEPARATOR);
+      String[] cells = line.split(Pattern.quote(COLUMN_SEPARATOR));
       assertEquals(5, cells.length, "unexpected column count in [" + line + "]");
       for (int i = 1; i < cells.length; i++) {
-        assertTrue(cells[i].trim().matches("-?[\\d,]+\.\\d{2}"),
-            "cell is not printed with two decimals: [" + cells[i] + "]");
+        assertHasTwoDecimals(cells[i], line);
       }
     }
     assertTrue(sawDataRow, "no data rows were printed");
@@ -85,11 +91,11 @@ class ReportFormattingTest {
     List<String> lines = runApp();
     boolean sawDataRow = false;
     for (String line : lines) {
-      if (!DATA_ROW.matcher(line).matches()) {
+      if (!isDataRow(line)) {
         continue;
       }
       sawDataRow = true;
-      String[] cells = line.split(COLUMN_SEPARATOR);
+      String[] cells = line.split(Pattern.quote(COLUMN_SEPARATOR));
       double start = parse(cells[1]);
       double contributions = parse(cells[2]);
       double interest = parse(cells[3]);
@@ -108,7 +114,7 @@ class ReportFormattingTest {
       if (!isTableRow(line)) {
         continue;
       }
-      String[] cells = line.split(COLUMN_SEPARATOR);
+      String[] cells = line.split(Pattern.quote(COLUMN_SEPARATOR));
       for (int i = 1; i < cells.length; i++) {
         String cell = cells[i];
         if (i == cells.length - 1) {
@@ -119,6 +125,14 @@ class ReportFormattingTest {
         }
       }
     }
+  }
+
+  private static void assertHasTwoDecimals(String cell, String line) {
+    String trimmed = cell.trim();
+    int dot = trimmed.indexOf('.');
+    assertTrue(dot > 0, "cell is not a decimal amount: [" + trimmed + "] in [" + line + "]");
+    assertEquals(2, trimmed.length() - dot - 1,
+        "cell is not printed with two decimals: [" + trimmed + "] in [" + line + "]");
   }
 
   private static double parse(String cell) {
