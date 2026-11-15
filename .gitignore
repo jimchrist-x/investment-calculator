@@ -2,6 +2,9 @@
 *.jar
 .env
 
+# The Gradle wrapper JAR is part of the build, everything else stays ignored
+!gradle/wrapper/gradle-wrapper.jar
+
 # Gradle
 .gradle/
 build/
