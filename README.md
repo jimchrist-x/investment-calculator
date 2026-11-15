@@ -5,25 +5,35 @@ sequence of investment periods.
 
 ## Requirements
 
-| Tool    | Version | Notes                                                        |
-|---------|---------|--------------------------------------------------------------|
-| JDK     | 21+     | `build.gradle.kts` pins the toolchain with `JavaLanguageVersion.of(21)` |
-| Gradle  | 8.9     | The build uses the Kotlin DSL                                      |
+| Tool    | Version | Notes                                                                     |
+|---------|---------|---------------------------------------------------------------------------|
+| JDK     | 21+     | `build.gradle.kts` pins the toolchain with `JavaLanguageVersion.of(21)`    |
+| Gradle  | 8.9     | Pinned by the committed wrapper; a local install is optional              |
 
-Building with an older JDK fails with
-`No matching toolchains found for requested specification: {languageVersion=21}` - install JDK 21
-(or newer) and point `JAVA_HOME` at it.
+The build targets Java 21 because that is the LTS the project is developed against. Nothing in the
+code needs anything newer: records and pattern matching for `instanceof` only require Java 17.
 
 ## Build & run
 
+The Gradle wrapper is committed, so no local Gradle installation is needed:
+
 ```bash
-gradle build   # compile and run the tests
-gradle test    # unit tests only
-gradle run     # print the yearly report, the monthly report and the summary
+./gradlew build   # compile and run the tests
+./gradlew test    # unit tests only
+./gradlew run     # print the yearly report, the monthly report and the summary
 ```
 
-This repository deliberately does not commit the Gradle wrapper. If you want one, generate it once
-with `gradle wrapper --gradle-version 8.9`; from then on `./gradlew <task>` works as usual.
+On Windows use `gradlew.bat build` and so on. The wrapper fetches Gradle 8.9 and verifies it against
+the SHA-256 checksum pinned in `gradle/wrapper/gradle-wrapper.properties`.
+
+A JDK 21 is still required. If none is installed, the toolchain resolver in `settings.gradle.kts`
+(`org.gradle.toolchains.foojay-resolver-convention`) downloads one on the first build, which needs
+network access. To use a JDK you already have, point `JAVA_HOME` at it. With an older JDK and
+auto-provisioning unavailable the build fails with
+`No matching toolchains found for requested specification: {languageVersion=21}`.
+
+A local Gradle 8.9 install also works (`gradle build`); other Gradle versions may work but are
+untested.
 
 ## Example plan
 
